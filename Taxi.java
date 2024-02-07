@@ -20,7 +20,7 @@ public class Taxi {
         this.totalEarnings = totalEarnings;
     }
 
-    public void setUpTaxies(int total) {
+    public void setUpTaxies(int total,ArrayList<Taxi> taxies) {
         int i = 1;
         while (i++ <= total) {
             Taxi taxi = new Taxi(number++, true, 'A', 0);

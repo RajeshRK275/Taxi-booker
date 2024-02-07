@@ -26,13 +26,12 @@ public class Booking {
         this.cost = cost;
     }
 
-    ArrayList<Booking> bookings = new ArrayList<>();
-    HashMap<Integer, ArrayList<Booking>> detailsMap = new HashMap<>();
+    
 
     Scanner sc = new Scanner(System.in);
     Taxi taxi = new Taxi();
 
-    public void bookTaxi() {
+    public void bookTaxi(ArrayList<Taxi> taxies, ArrayList<Booking> bookings, HashMap<Integer, ArrayList<Booking>> detailsMap) {
         System.out.println("Enter the Pick-Up Location : ");
         char pickUpLocation = sc.next().charAt(0);
         System.out.println("Enter the Drop Location : ");
@@ -77,6 +76,7 @@ public class Booking {
             }
             detailsMap.get(allocatedTaxi.taxiNumber).add(booked);
             allocatedTaxi.setTotalEarnings(rideCost);
+            allocatedTaxi.setLocation(dropLocation);
             ///////
             return;
         }
@@ -109,6 +109,8 @@ public class Booking {
         }
         detailsMap.get(minDistanceTaxi.taxiNumber).add(booked);
         minDistanceTaxi.setTotalEarnings(rideCost);
+        minDistanceTaxi.setLocation(dropLocation);
+
         ///////
         return;
     }
@@ -121,10 +123,18 @@ public class Booking {
         return fare;
     }
 
-    public void printDetails() {
-        for (Taxi t : taxi.taxies) {
-            System.out.println("--> TaxiNumber : " + t.taxiNumber + "\n Availability : " + t.getAvailability() +
-                    "\n Current Location : " + t.getLocation() + "\n Total Earnings : " + t.getTotalEarnings());
+    // id++, minDistanceTaxi.taxiNumber, pickUpLocation, dropLocation, actualPickedUpTime,dropTime, rideCost
+
+    public void printDetails( ArrayList<Taxi> taxies, HashMap<Integer, ArrayList<Booking>> detailsMap) {
+        for (Taxi t : taxies) {
+            System.out.println("--> TaxiNumber : " + t.taxiNumber + " || Availability : " + t.getAvailability() +
+                    " || Current Location : " + t.getLocation() + " || Total Earnings : " + t.getTotalEarnings());
+            if(!detailsMap.isEmpty()){
+                for(Booking b : detailsMap.get(t.taxiNumber)){
+                    System.out.println("\n"+b.bookingId + " " + b.taxiNumber + " "+b.pickUpLocation + " " + b.dropLocation +
+                     " " + b.pickUpTime + " " + b.dropTime + " " + b.cost);
+                }
+            }
         }
     }
 }

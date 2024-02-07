@@ -9,9 +9,14 @@ public class Main {
         Booking book = new Booking();
         Scanner sc = new Scanner(System.in);
 
+        ArrayList<Taxi> taxies = new ArrayList<>();
+        ArrayList<Booking> bookings = new ArrayList<>();
+        HashMap<Integer, ArrayList<Booking>> detailsMap = new HashMap<>();
+
+
         System.out.print("Enter the number of Taxies : ");
         int totalTaxies = sc.nextInt();
-        taxi.setUpTaxies(totalTaxies);
+        taxi.setUpTaxies(totalTaxies,taxies);
         int ch;
 
         do {
@@ -20,11 +25,11 @@ public class Main {
             switch (ch) {
                 case 1:
                     System.out.println("Taxi Booking !!!");
-                    book.bookTaxi();
+                    book.bookTaxi(taxies,bookings,detailsMap);
                     break;
                 case 2:
                     System.out.println("Taxi Details !!!");
-                    book.printDetails();
+                    book.printDetails(taxies, detailsMap);
                     break;
             }
         } while (ch < 3);
