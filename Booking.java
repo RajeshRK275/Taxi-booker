@@ -1,3 +1,5 @@
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -8,15 +10,16 @@ public class Booking {
     int taxiNumber;
     char pickUpLocation;
     char dropLocation;
-    int pickUpTime;
-    int dropTime;
+    LocalTime pickUpTime;
+    LocalTime dropTime;
     int cost;
 
     public Booking(Taxi taxi) {
         this.taxi = taxi;
     }
 
-    public Booking(int bookingId, int taxiNumber, char pickUpLocation, char dropLocation, int pickUpTime, int dropTime,
+    public Booking(int bookingId, int taxiNumber, char pickUpLocation, char dropLocation, LocalTime pickUpTime,
+            LocalTime dropTime,
             int cost) {
         this.bookingId = bookingId;
         this.taxiNumber = taxiNumber;
@@ -27,18 +30,28 @@ public class Booking {
         this.cost = cost;
     }
 
-
-
     Scanner sc = new Scanner(System.in);
     Taxi taxi;
 
-    public void bookTaxi(ArrayList<Taxi> taxies, ArrayList<Booking> bookings, HashMap<Integer, ArrayList<Booking>> detailsMap) {
+    public void bookTaxi(ArrayList<Taxi> taxies, ArrayList<Booking> bookings,
+            HashMap<Integer, ArrayList<Booking>> detailsMap) {
         System.out.println("Enter the Pick-Up Location : ");
         char pickUpLocation = sc.next().charAt(0);
         System.out.println("Enter the Drop Location : ");
         char dropLocation = sc.next().charAt(0);
-        System.out.println("Enter the Pick-Up Time (0-23): ");
-        int pickUpTime = sc.nextInt();
+        System.out.println("Enter the Pick-Up Time in (HH:mm) format: ");
+        String pickUpTimeString = sc.next();
+
+        System.out.println("Pick-Up Location: " + pickUpLocation);
+        System.out.println("Drop Location: " + dropLocation);
+        System.out.println("Pick-Up Time: " + pickUpTimeString);
+
+        try {
+            pickUpTime = LocalTime.parse(pickUpTimeString);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid time format. Please enter time in HH:mm format.");
+            return;
+        }
 
         if (pickUpLocation < 'A' || pickUpLocation > 'F' || dropLocation < 'A' || dropLocation > 'F') {
             System.out.println("Invalid Input !!! \n -- Pick-Up and Drop locations are limited to A,B,C,D,E and F --");
@@ -46,12 +59,9 @@ public class Booking {
         } else if (pickUpLocation == dropLocation) {
             System.out.println("Invalid Input !!! \n -- Pick-Up and Drop location cannot be same --");
             return;
-        } else if (pickUpTime < 0 || pickUpTime > 23) {
-            System.out.println("Invalid Input !!! \n -- Pick-Up Time is limited to 0 - 23 --");
-            return;
         }
 
-        ArrayList<Taxi> freeTaxies = taxi.getFreeTaxies();
+        ArrayList<Taxi> freeTaxies = taxi.getFreeTaxies(pickUpTime);
 
         if (freeTaxies.size() == 0) {
             System.out.println(" Oops BOOKING REJECTED !!! \n --- No taxi Available Currently ---");
@@ -68,7 +78,7 @@ public class Booking {
         if (onSpotTaxies.size() != 0) {
             Taxi allocatedTaxi = taxi.getLeastEarnedTaxi(onSpotTaxies);
             int rideCost = calculateFare(pickUpLocation, dropLocation);
-            dropTime = pickUpTime + Math.abs(dropLocation - pickUpLocation);
+            dropTime = pickUpTime.plusHours((long) Math.abs(dropLocation - pickUpLocation));
             Booking booked = new Booking(id++, allocatedTaxi.taxiNumber, pickUpLocation, dropLocation, pickUpTime,
                     dropTime, rideCost);
             bookings.add(booked);
@@ -78,7 +88,8 @@ public class Booking {
             detailsMap.get(allocatedTaxi.taxiNumber).add(booked);
             allocatedTaxi.setTotalEarnings(rideCost);
             allocatedTaxi.setLocation(dropLocation);
-            ///////
+            allocatedTaxi.setAvailabileTime(dropTime);
+            successMessage(allocatedTaxi.taxiNumber);
             return;
         }
 
@@ -99,9 +110,10 @@ public class Booking {
                 minDistanceTaxi = taxi;
             }
         }
+
         int rideCost = calculateFare(pickUpLocation, dropLocation);
-        int actualPickedUpTime = pickUpTime + minDistance;
-        dropTime = actualPickedUpTime + Math.abs(dropLocation - pickUpLocation);
+        LocalTime actualPickedUpTime = pickUpTime.plusHours((long) minDistance);
+        dropTime = actualPickedUpTime.plusHours((long) Math.abs(dropLocation - pickUpLocation));
         Booking booked = new Booking(id++, minDistanceTaxi.taxiNumber, pickUpLocation, dropLocation, actualPickedUpTime,
                 dropTime, rideCost);
         bookings.add(booked);
@@ -111,8 +123,8 @@ public class Booking {
         detailsMap.get(minDistanceTaxi.taxiNumber).add(booked);
         minDistanceTaxi.setTotalEarnings(rideCost);
         minDistanceTaxi.setLocation(dropLocation);
-
-        ///////
+        minDistanceTaxi.setAvailabileTime(dropTime);
+        successMessage(minDistanceTaxi.taxiNumber);
         return;
     }
 
@@ -124,16 +136,21 @@ public class Booking {
         return fare;
     }
 
-    // id++, minDistanceTaxi.taxiNumber, pickUpLocation, dropLocation, actualPickedUpTime,dropTime, rideCost
+    public void successMessage(int taxiNum){
+        System.out.println(" --- Taxi Can Be Allotted --- ");
+        System.out.println("***  Taxi - "+taxiNum+" Can Be Allotted  ***");
+    }
 
-    public void printDetails( ArrayList<Taxi> taxies, HashMap<Integer, ArrayList<Booking>> detailsMap) {
+    public void printDetails(ArrayList<Taxi> taxies, HashMap<Integer, ArrayList<Booking>> detailsMap) {
         for (Taxi t : taxies) {
-            System.out.println("--> TaxiNumber : " + t.taxiNumber + " || Availability : " + t.getAvailability() +
+            if (detailsMap.containsKey(t.taxiNumber)) {
+                System.out.println("\n--> TaxiNumber : " + t.taxiNumber + " ||  Available Time : " + t.getAvailabileTime() +
                     " || Current Location : " + t.getLocation() + " || Total Earnings : " + t.getTotalEarnings());
-            if(!detailsMap.isEmpty()){
-                for(Booking b : detailsMap.get(t.taxiNumber)){
-                    System.out.println("\n"+b.bookingId + " " + b.taxiNumber + " "+b.pickUpLocation + " " + b.dropLocation +
-                     " " + b.pickUpTime + " " + b.dropTime + " " + b.cost);
+                System.out.println("\n\t Booking ID || TaxiNumber || PickUp || Drop || PickUp Time || Drop Time || Trip Cost ");
+                for (Booking b : detailsMap.get(t.taxiNumber)) {
+                    System.out.println(
+                            "\t\t" + b.bookingId + "\t\t" + b.taxiNumber + "\t" + b.pickUpLocation + "\t" + b.dropLocation +
+                                    "\t" + b.pickUpTime + "\t\t" + b.dropTime + "\t\t" + b.cost);
                 }
             }
         }

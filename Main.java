@@ -12,7 +12,6 @@ public class Main {
         ArrayList<Booking> bookings = new ArrayList<>();
         HashMap<Integer, ArrayList<Booking>> detailsMap = new HashMap<>();
 
-
         System.out.print("Enter the number of Taxies : ");
         int totalTaxies = sc.nextInt();
         taxi.setUpTaxies(totalTaxies);
@@ -32,5 +31,6 @@ public class Main {
                     break;
             }
         } while (ch < 3);
+        sc.close();
     }
 }
