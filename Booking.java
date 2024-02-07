@@ -12,7 +12,8 @@ public class Booking {
     int dropTime;
     int cost;
 
-    public Booking() {
+    public Booking(Taxi taxi) {
+        this.taxi = taxi;
     }
 
     public Booking(int bookingId, int taxiNumber, char pickUpLocation, char dropLocation, int pickUpTime, int dropTime,
@@ -26,10 +27,10 @@ public class Booking {
         this.cost = cost;
     }
 
-    
+
 
     Scanner sc = new Scanner(System.in);
-    Taxi taxi = new Taxi();
+    Taxi taxi;
 
     public void bookTaxi(ArrayList<Taxi> taxies, ArrayList<Booking> bookings, HashMap<Integer, ArrayList<Booking>> detailsMap) {
         System.out.println("Enter the Pick-Up Location : ");
