@@ -8,7 +8,7 @@ public class Taxi {
     private char currentLocation = 'A';
     private int totalEarnings = 0;
 
-    ArrayList<Taxi> taxies = new ArrayList<>();
+    public  ArrayList<Taxi> taxies = new ArrayList<>();
 
     public Taxi() {
     }
@@ -20,11 +20,11 @@ public class Taxi {
         this.totalEarnings = totalEarnings;
     }
 
-    public void setUpTaxies(int total,ArrayList<Taxi> taxies) {
+    public void setUpTaxies(int total) {
         int i = 1;
         while (i++ <= total) {
             Taxi taxi = new Taxi(number++, true, 'A', 0);
-            taxies.add(taxi);
+            this.taxies.add(taxi);
         }
         return;
     }
@@ -40,7 +40,7 @@ public class Taxi {
     }
 
     public Taxi getLeastEarnedTaxi(ArrayList<Taxi> taxies){
-        Taxi leastEarned = null;
+        Taxi leastEarned = taxies.get(0);
         int minEarnings = Integer.MAX_VALUE;
         for(Taxi t : taxies){
             if(minEarnings <= t.getTotalEarnings()){

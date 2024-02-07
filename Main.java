@@ -6,17 +6,16 @@ public class Main {
     public static void main(String[] args) {
 
         Taxi taxi = new Taxi();
-        Booking book = new Booking();
+        Booking book = new Booking(taxi);
         Scanner sc = new Scanner(System.in);
 
-        ArrayList<Taxi> taxies = new ArrayList<>();
         ArrayList<Booking> bookings = new ArrayList<>();
         HashMap<Integer, ArrayList<Booking>> detailsMap = new HashMap<>();
 
 
         System.out.print("Enter the number of Taxies : ");
         int totalTaxies = sc.nextInt();
-        taxi.setUpTaxies(totalTaxies,taxies);
+        taxi.setUpTaxies(totalTaxies);
         int ch;
 
         do {
@@ -25,11 +24,11 @@ public class Main {
             switch (ch) {
                 case 1:
                     System.out.println("Taxi Booking !!!");
-                    book.bookTaxi(taxies,bookings,detailsMap);
+                    book.bookTaxi(taxi.taxies,bookings,detailsMap);
                     break;
                 case 2:
                     System.out.println("Taxi Details !!!");
-                    book.printDetails(taxies, detailsMap);
+                    book.printDetails(taxi.taxies, detailsMap);
                     break;
             }
         } while (ch < 3);
