@@ -13,11 +13,12 @@ public class Booking {
     LocalTime pickUpTime;
     LocalTime dropTime;
     int cost;
+    Taxi taxi;
 
     public Booking(Taxi taxi) {
         this.taxi = taxi;
     }
-
+    // public ArrayList<Taxi> taxies = new ArrayList<>();
     public Booking(int bookingId, int taxiNumber, char pickUpLocation, char dropLocation, LocalTime pickUpTime,
             LocalTime dropTime,
             int cost) {
@@ -31,7 +32,6 @@ public class Booking {
     }
 
     Scanner sc = new Scanner(System.in);
-    Taxi taxi;
 
     public void bookTaxi(ArrayList<Taxi> taxies, ArrayList<Booking> bookings,
             HashMap<Integer, ArrayList<Booking>> detailsMap) {
@@ -74,7 +74,7 @@ public class Booking {
             if (t.getLocation() == pickUpLocation)
                 onSpotTaxies.add(t);
         }
-
+        //onspot
         if (onSpotTaxies.size() != 0) {
             Taxi allocatedTaxi = taxi.getLeastEarnedTaxi(onSpotTaxies);
             int rideCost = calculateFare(pickUpLocation, dropLocation);
@@ -156,3 +156,14 @@ public class Booking {
         }
     }
 }
+
+// 3 taxies
+// 1-> 9-11 a-c 
+// 2-> 10-12 a-c
+// 3-> 10-11 a-b
+// 4-> 11-15 d-a
+// 5->  (d,b)c
+
+// T1 - A - 16
+// T2 - E - 11
+// T3 - A - 12

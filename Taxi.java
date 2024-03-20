@@ -45,7 +45,7 @@ public class Taxi {
         Taxi leastEarned = taxies.get(0);
         int minEarnings = Integer.MAX_VALUE;
         for (Taxi t : taxies) {
-            if (minEarnings <= t.getTotalEarnings()) {
+            if (minEarnings < t.getTotalEarnings()) {
                 minEarnings = t.getTotalEarnings();
                 leastEarned = t;
             }
